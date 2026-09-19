@@ -1,0 +1,4 @@
+flags.json
+svg/
+__pycache__/
+*.pyc

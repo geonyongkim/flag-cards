@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="세계 197개국 국기를 카드로 넘겨보며 나라 이름을 익히는 아이용 학습 카드.">
+<meta name="theme-color" content="#dceef7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141d2e" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="국기 카드">
+<meta property="og:title" content="세계 국기 카드">
+<meta property="og:description" content="세계 197개국 국기를 카드로 넘겨보며 나라 이름을 익히는 아이용 학습 카드.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
+    <title>세계 국기 카드</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Fredoka:wght@400;500;600&display=swap">
+<style>
+    html{color-scheme:light dark}
+    body{margin:0;font:14px system-ui,-apple-system,sans-serif}
+    img{max-width:100%}
+    [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<style>
+:root{
+  --ink:#253245;        /* 진한 남색 — 검정 대신 */
+  --ink-soft:#5b6b80;
+  --paper:#fffdf8;      /* 카드 — 따뜻한 흰색 */
+  --ground:#dceef7;     /* 배경 — 아이 방 하늘색 */
+  --ground-2:#c9e4f2;
+  --sun:#ffb13c;        /* 액센트 */
+  --grass:#4caf6d;      /* 정답 */
+  --berry:#ff6b8a;      /* 포인트 */
+  --edge:#253245;
+  --shadow:rgba(37,50,69,.22);
+  --chip:#ffffff;
+  --chip-ink:#41526b;
+  --star-off:#b9cddb;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#f2f6fb;
+    --ink-soft:#a9bbd0;
+    --paper:#22304a;
+    --ground:#141d2e;
+    --ground-2:#1b2740;
+    --sun:#ffc266;
+    --grass:#68d38d;
+    --berry:#ff8fa6;
+    --edge:#0c1322;
+    --shadow:rgba(0,0,0,.5);
+    --chip:#2b3a56;
+    --chip-ink:#dce7f4;
+    --star-off:#3d4f6d;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#f2f6fb;
+  --ink-soft:#a9bbd0;
+  --paper:#22304a;
+  --ground:#141d2e;
+  --ground-2:#1b2740;
+  --sun:#ffc266;
+  --grass:#68d38d;
+  --berry:#ff8fa6;
+  --edge:#0c1322;
+  --shadow:rgba(0,0,0,.5);
+  --chip:#2b3a56;
+  --chip-ink:#dce7f4;
+  --star-off:#3d4f6d;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding-block:18px 32px;
+  padding-left:16px; padding-right:16px;
+  background:var(--ground);
+  background-image:radial-gradient(circle at 12% 8%, var(--ground-2) 0 22%, transparent 22.5%),
+                   radial-gradient(circle at 88% 82%, var(--ground-2) 0 18%, transparent 18.5%);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:'Jua','Fredoka',-apple-system,'Malgun Gothic',sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+/* ── 머리 ── */
+header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
+.stars{
+  display:flex;align-items:center;gap:6px;
+  background:var(--chip);color:var(--chip-ink);
+  border:2.5px solid var(--edge);border-radius:999px;
+  padding:6px 14px;box-shadow:0 3px 0 var(--edge);
+  font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;
+  font-variant-numeric:tabular-nums;
+}
+.stars b{color:var(--sun);font-size:19px}
+
+/* ── 단계 칩 ── */
+.levels{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:'Jua',sans-serif;font-size:15px;
+  background:var(--chip);color:var(--chip-ink);
+  border:2.5px solid var(--edge);border-radius:999px;
+  padding:7px 14px;cursor:pointer;
+  box-shadow:0 3px 0 var(--edge);
+  transition:transform .12s, background .12s, color .12s;
+}
+.chip:hover{transform:translateY(-1px)}
+.chip:active{transform:translateY(3px);box-shadow:0 0 0 var(--edge)}
+.chip[aria-pressed="true"]{background:var(--sun);color:#2a1c05}
+.chip:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+
+/* ── 진행 ── */
+.bar{display:flex;align-items:center;gap:10px}
+.track{flex:1;height:12px;border:2.5px solid var(--edge);border-radius:999px;background:var(--chip);overflow:hidden}
+.fill{height:100%;width:0;background:var(--grass);transition:width .3s}
+.count{font-family:'Fredoka',sans-serif;font-weight:600;font-size:16px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+/* ── 카드 ── */
+.stage{perspective:1200px}
+.card{
+  position:relative;width:100%;aspect-ratio:4/3;
+  cursor:pointer;border:0;padding:0;background:none;
+  transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,.9,.3,1);
+  font:inherit;color:inherit;display:block;
+}
+.card.flip{transform:rotateY(180deg)}
+.card:focus-visible{outline:4px solid var(--berry);outline-offset:6px;border-radius:26px}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;
+  background:var(--paper);border:4px solid var(--edge);border-radius:24px;
+  box-shadow:0 8px 0 var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;padding:18px;overflow:hidden;
+}
+.back{transform:rotateY(180deg)}
+
+.flagbox{
+  width:100%;flex:1;min-height:0;
+  display:grid;place-items:center;
+}
+.flagbox svg{
+  width:100%;height:100%;max-width:100%;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.18));
+}
+.hint{font-size:15px;color:var(--ink-soft)}
+
+/* 뒷면 */
+.name{font-size:clamp(30px,8.5vw,44px);line-height:1.15;text-align:center;text-wrap:balance;margin:0}
+.en{font-family:'Fredoka',sans-serif;font-weight:500;font-size:clamp(14px,3.6vw,18px);color:var(--ink-soft);text-align:center;margin:0}
+.cont{
+  background:var(--grass);color:#06240f;
+  border:2.5px solid var(--edge);border-radius:999px;
+  padding:5px 14px;font-size:15px;
+}
+:root[data-theme="dark"] .cont,
+:root:not([data-theme="light"]) .cont{color:#06240f}
+.minflag{width:82px;border:2.5px solid var(--edge);border-radius:8px;overflow:hidden;display:grid;line-height:0}
+.minflag svg{width:100%;height:auto;display:block}
+
+/* ── 버튼 ── */
+.nav{display:flex;gap:10px}
+.btn{
+  flex:1;font-family:'Jua',sans-serif;font-size:18px;
+  background:var(--paper);color:var(--ink);
+  border:3px solid var(--edge);border-radius:16px;
+  padding:13px 8px;cursor:pointer;
+  box-shadow:0 4px 0 var(--edge);
+  transition:transform .12s, box-shadow .12s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--edge)}
+.btn:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.btn.main{background:var(--sun);color:#2a1c05;flex:1.5}
+
+.tip{text-align:center;font-size:15px;color:var(--ink-soft);margin:0}
+
+/* 별 획득 반짝 */
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-8deg)}100%{transform:scale(1)}}
+.pop{animation:pop .45s ease}
+
+@media (prefers-reduced-motion:reduce){
+  .card,.fill,.chip,.btn{transition:none}
+  .pop{animation:none}
+}
+@media (max-width:420px){
+  h1{font-size:22px}
+  .card{aspect-ratio:1/1}
+}
+
+/* ── 태블릿 세로 — 화면이 넓으니 카드와 글씨를 키운다 ── */
+@media (min-width:700px) and (orientation:portrait){
+  body{padding-block:28px 40px}
+  .wrap{max-width:660px;gap:20px}
+  h1{font-size:32px}
+  .stars{font-size:19px;padding:8px 18px}
+  .stars b{font-size:22px}
+  .chip{font-size:17px;padding:9px 17px}
+  .card{aspect-ratio:3/2}
+  .btn{font-size:21px;padding:17px 10px;border-radius:18px}
+  .hint,.tip{font-size:17px}
+  .count{font-size:18px}
+}
+
+/* ── 가로 — 세로 공간이 모자라니 카드(왼쪽)와 조작부(오른쪽)를 나눈다 ── */
+@media (orientation:landscape) and (min-width:760px){
+  body{padding-block:16px 20px}
+  .wrap{
+    max-width:1180px;
+    min-height:calc(100dvh - 36px);
+    align-content:center;          /* 남는 세로 공간을 위아래로 나눠 가운데 앉힌다 */
+    display:grid;
+    grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);
+    grid-template-areas:
+      "stage head"
+      "stage levels"
+      "stage bar"
+      "stage nav"
+      "stage tip";
+    grid-template-rows:auto auto auto auto 1fr;
+    align-items:start;
+    gap:14px 28px;
+  }
+  header{grid-area:head}
+  .levels{grid-area:levels}
+  .bar{grid-area:bar}
+  .nav{grid-area:nav;flex-wrap:wrap}
+  .tip{grid-area:tip;text-align:left}
+  .stage{grid-area:stage;align-self:center;display:grid;place-items:center}
+  .card{
+    aspect-ratio:3/2;
+    /* 화면 높이를 넘지 않게 — 3:2라서 허용 높이에 1.5를 곱하면 너비 한계가 된다 */
+    max-width:calc((100dvh - 56px) * 1.5);
+  }
+  .btn{flex:1 1 130px}
+  .btn.main{flex:1 1 100%;order:-1}
+}
+
+/* 폰을 눕힌 경우 — 세로가 390px 남짓이라 조작부를 촘촘하게 */
+@media (orientation:landscape) and (max-height:470px){
+  body{padding-block:12px}
+  .wrap{gap:9px 18px;min-height:calc(100dvh - 24px)}
+  h1{font-size:20px}
+  .stars{font-size:15px;padding:4px 11px}
+  .stars b{font-size:17px}
+  .chip{font-size:13.5px;padding:5px 11px;box-shadow:0 2px 0 var(--edge)}
+  .btn{font-size:16px;padding:10px 6px;box-shadow:0 3px 0 var(--edge)}
+  .tip{display:none}         /* 카드 안에 같은 안내가 있다 */
+  .card{max-width:calc((100dvh - 34px) * 1.5)}
+}
+
+/* dvh를 모르는 브라우저를 위한 대비 */
+@supports not (height:100dvh){
+  @media (orientation:landscape) and (min-width:760px){
+    .wrap{min-height:calc(100vh - 36px)}
+    .card{max-width:calc((100vh - 56px) * 1.5)}
+  }
+  @media (orientation:landscape) and (max-height:470px){
+    .wrap{min-height:calc(100vh - 24px)}
+    .card{max-width:calc((100vh - 34px) * 1.5)}
+  }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>세계 국기 카드</h1>
+    <div class="stars" title="처음 본 나라마다 별 하나">
+      <span id="starIcon">⭐</span><b id="starNum">0</b>
+    </div>
+  </header>
+
+  <div class="levels" id="levels" role="group" aria-label="단계 고르기"></div>
+
+  <div class="bar">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <span class="count" id="count">1 / 30</span>
+  </div>
+
+  <div class="stage">
+    <button class="card" id="card" aria-live="polite">
+      <span class="face front">
+        <span class="flagbox" id="flagbox"></span>
+        <span class="hint">어느 나라 국기일까?</span>
+      </span>
+      <span class="face back">
+        <span class="minflag" id="minflag"></span>
+        <p class="name" id="name">대한민국</p>
+        <p class="en" id="en">South Korea</p>
+        <span class="cont" id="cont">아시아</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prev">← 앞으로</button>
+    <button class="btn main" id="next">다음 나라 →</button>
+    <button class="btn" id="shuffle">🔀 섞기</button>
+  </div>
+
+  <p class="tip" id="tip">카드를 누르면 정답이 나와요</p>
+</div>
+
+<script src="flags.js"></script>
+<script>
+(function(){
+  var ALL = window.FLAGS || [];
+  var LEVELS = [
+    {id:'easy',  label:'쉬워요',  pick:function(f){return f.d===1}},
+    {id:'mid',   label:'보통',    pick:function(f){return f.d<=2}},
+    {id:'all',   label:'전부',    pick:function(){return true}},
+    {id:'아시아',   label:'아시아',   pick:function(f){return f.t==='아시아'}},
+    {id:'유럽',     label:'유럽',     pick:function(f){return f.t==='유럽'}},
+    {id:'아프리카', label:'아프리카', pick:function(f){return f.t==='아프리카'}},
+    {id:'북아메리카',label:'북아메리카',pick:function(f){return f.t==='북아메리카'}},
+    {id:'남아메리카',label:'남아메리카',pick:function(f){return f.t==='남아메리카'}},
+    {id:'오세아니아',label:'오세아니아',pick:function(f){return f.t==='오세아니아'}}
+  ];
+
+  // '쉬워요'는 아이에게 익숙한 순서로 — 우리나라부터 시작해 가까운 나라, 자주 듣는 나라 순
+  var EASY_ORDER = ['kr','us','jp','cn','gb','fr','de','it','ca','au','br','es',
+                    'ru','in','mx','ch','se','no','nl','eg','th','vn','ph','sg',
+                    'nz','ar','tr','gr','pt','za'];
+
+  var $ = function(id){return document.getElementById(id)};
+  var deck = [], at = 0, shown = false, level = 'easy';
+  var seen = load();
+
+  function load(){
+    try{
+      var raw = localStorage.getItem('flagcards.seen');
+      return raw ? JSON.parse(raw) : {};
+    }catch(e){ return {}; }
+  }
+  function save(){
+    try{ localStorage.setItem('flagcards.seen', JSON.stringify(seen)); }catch(e){}
+  }
+
+  function build(id){
+    level = id;
+    var L = LEVELS.filter(function(x){return x.id===id})[0] || LEVELS[0];
+    deck = ALL.filter(L.pick);
+    if(id === 'easy'){
+      deck.sort(function(a,b){
+        var ia = EASY_ORDER.indexOf(a.c), ib = EASY_ORDER.indexOf(b.c);
+        return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+      });
+    }else{
+      shuffle();
+    }
+    at = 0; shown = false;
+    render();
+    chips();
+  }
+
+  function shuffle(){
+    for(var i=deck.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t = deck[i]; deck[i] = deck[j]; deck[j] = t;
+    }
+  }
+
+  function chips(){
+    var box = $('levels');
+    box.innerHTML = '';
+    LEVELS.forEach(function(L){
+      var n = ALL.filter(L.pick).length;
+      var b = document.createElement('button');
+      b.className = 'chip';
+      b.type = 'button';
+      b.id = 'lv-' + L.id;
+      b.setAttribute('aria-pressed', String(L.id===level));
+      b.textContent = L.label + ' ' + n;
+      b.addEventListener('click', function(){ build(L.id); });
+      box.appendChild(b);
+    });
+  }
+
+  function render(){
+    var f = deck[at];
+    if(!f) return;
+    $('flagbox').innerHTML = f.s;
+    $('minflag').innerHTML = f.s;
+    $('name').textContent = f.k;
+    $('en').textContent = f.e;
+    $('cont').textContent = f.t;
+    $('count').textContent = (at+1) + ' / ' + deck.length;
+    $('fill').style.width = ((at+1)/deck.length*100) + '%';
+    $('card').classList.toggle('flip', shown);
+    $('card').setAttribute('aria-label',
+      shown ? ('정답 ' + f.k + '. 누르면 다음 나라')
+            : '국기 카드. 누르면 정답이 나옵니다');
+    $('tip').textContent = shown ? '한 번 더 누르면 다음 나라로 가요'
+                                 : '카드를 누르면 정답이 나와요';
+    $('starNum').textContent = Object.keys(seen).length;
+  }
+
+  function reveal(){
+    shown = true;
+    var f = deck[at];
+    if(f && !seen[f.c]){
+      seen[f.c] = 1; save();
+      var ic = $('starIcon');
+      ic.classList.remove('pop');
+      void ic.offsetWidth;
+      ic.classList.add('pop');
+    }
+    render();
+  }
+
+  function go(step){
+    if(!deck.length) return;
+    at = (at + step + deck.length) % deck.length;
+    shown = false;
+    render();
+  }
+
+  $('card').addEventListener('click', function(){
+    if(shown) go(1); else reveal();
+  });
+  $('next').addEventListener('click', function(e){ e.stopPropagation(); go(1); });
+  $('prev').addEventListener('click', function(e){ e.stopPropagation(); go(-1); });
+  $('shuffle').addEventListener('click', function(){
+    shuffle(); at = 0; shown = false; render();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ go(1); e.preventDefault(); }
+    else if(e.key === 'ArrowLeft'){ go(-1); e.preventDefault(); }
+  });
+
+  // 모바일 좌우 쓸기
+  var x0 = null;
+  var stage = document.querySelector('.stage');
+  stage.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener('touchend', function(e){
+    if(x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 55){ go(dx < 0 ? 1 : -1); }
+    x0 = null;
+  }, {passive:true});
+
+  build('easy');
+})();
+</script>
+</body>
+</html>
