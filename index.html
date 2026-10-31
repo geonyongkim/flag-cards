@@ -163,13 +163,163 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-8deg)}100%{transform:scale(1)}}
 .pop{animation:pop .45s ease}
 
+[hidden]{display:none!important}
+
+/* ── 모드 고르기(카드 / 수도 퀴즈 / 랜드마크 퀴즈) ── */
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mode{
+  min-height:56px;font-family:'Jua',sans-serif;font-size:19px;line-height:1.15;
+  word-break:keep-all;text-wrap:balance;
+  background:var(--chip);color:var(--chip-ink);
+  border:3px solid var(--edge);border-radius:16px;
+  padding:8px 10px;cursor:pointer;
+  box-shadow:0 4px 0 var(--edge);
+  transition:transform .12s, box-shadow .12s, background .12s;
+}
+.mode:hover{transform:translateY(-1px)}
+.mode:active{transform:translateY(4px);box-shadow:0 0 0 var(--edge)}
+.mode:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.mode[aria-pressed="true"]{background:var(--sun);color:#2a1c05}
+.quiz-on .chip{min-height:52px;padding-inline:16px}
+
+/* ── 수도 퀴즈 ── */
+.qstage{display:grid;place-items:center}
+.qcard{
+  position:relative;width:100%;aspect-ratio:4/3;
+  background:var(--paper);border:4px solid var(--edge);border-radius:24px;
+  box-shadow:0 8px 0 var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:18px;overflow:hidden;
+}
+.qcard .flagbox svg{width:100%;height:100%}
+.qname{
+  background:var(--grass);color:#06240f;
+  border:2.5px solid var(--edge);border-radius:999px;
+  padding:4px 16px;font-size:clamp(17px,4.4vw,22px);
+}
+.qask{margin:0;font-size:clamp(22px,6vw,30px);text-align:center;text-wrap:balance}
+.qside{display:flex;flex-direction:column;gap:12px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{
+  min-height:64px;font-family:'Jua',sans-serif;font-size:clamp(19px,5vw,24px);line-height:1.15;
+  background:var(--paper);color:var(--ink);
+  border:3px solid var(--edge);border-radius:18px;
+  padding:10px 8px;cursor:pointer;text-wrap:balance;
+  box-shadow:0 4px 0 var(--edge);
+  transition:transform .12s, box-shadow .12s, background .15s, opacity .15s;
+}
+.opt:hover:not(:disabled){transform:translateY(-1px)}
+.opt:active:not(:disabled){transform:translateY(4px);box-shadow:0 0 0 var(--edge)}
+.opt:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--grass);color:#06240f;opacity:1}
+.opt.ok::after{content:" ✓"}
+.opt.no{opacity:.6}
+.opt.dim{opacity:.5}
+.opt,.qask,.qtip,.qres p{word-break:keep-all;overflow-wrap:anywhere}
+.qrow{display:flex;gap:10px}
+.qrow .btn{min-height:56px}
+.qtip{text-align:center;font-size:18px;margin:0;min-height:1.4em;text-wrap:balance}
+.qtip.good{color:var(--grass)}
+
+/* 결과 화면 */
+.qres{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.qres .big{font-size:clamp(46px,12vw,64px);line-height:1}
+.qres h2{margin:0;font-size:clamp(26px,7vw,34px)}
+.qres p{margin:0;font-size:18px;color:var(--ink-soft)}
+.qstars{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;font-size:clamp(24px,6.5vw,32px);line-height:1}
+.qstars .off{filter:grayscale(1);opacity:.35}
+
+/* 정답 별 터지기 */
+.burst{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.burst span{position:absolute;left:50%;top:55%;font-size:34px;animation:fly .9s ease-out forwards}
+@keyframes fly{
+  0%{transform:translate(-50%,-50%) scale(.4);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.2) rotate(var(--r));opacity:0}
+}
+@keyframes cheer{0%{transform:scale(1)}35%{transform:scale(1.04)}100%{transform:scale(1)}}
+.qcard.cheer{animation:cheer .4s ease}
+
+/* ── 랜드마크 퀴즈 — 사진을 카드 가득, 질문은 그 아래 ── */
+.land-on .qcard{gap:8px;padding:12px}
+.land-on .qask{font-size:clamp(19px,5.2vw,26px)}
+.lphoto{
+  position:relative;width:100%;flex:1;min-height:0;
+  border:3px solid var(--edge);border-radius:16px;overflow:hidden;
+  background:var(--ground-2);
+}
+.lphoto img{width:100%;height:100%;object-fit:cover;display:block}
+/* 사진을 못 불러왔을 때 — 이모지 + 랜드마크 이름(나라 이름은 보여주지 않는다) */
+.lfall{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;
+}
+.lfall .em{font-size:clamp(56px,16vw,96px);line-height:1}
+.lfall b{font-size:clamp(22px,6vw,30px);font-weight:400}
+.lfall small{font-size:15px;color:var(--ink-soft)}
+/* 답한 뒤 사진 위에 붙는 이름표: [국기] 에펠탑 · 프랑스 */
+.lcap{
+  position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);
+  display:flex;align-items:center;gap:8px;
+  background:var(--paper);color:var(--ink);
+  border:2.5px solid var(--edge);border-radius:999px;
+  padding:5px 14px 5px 6px;box-shadow:0 3px 0 var(--edge);
+  font-size:clamp(16px,4.4vw,21px);line-height:1.2;
+  word-break:keep-all;animation:capin .3s ease;
+}
+@keyframes capin{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.tflag{
+  display:inline-block;width:40px;flex:none;vertical-align:middle;margin:0 2px;
+  border:2px solid var(--edge);border-radius:5px;overflow:hidden;line-height:0;
+}
+.tflag svg{width:100%;height:auto;display:block}
+.lcap .tflag{width:36px}
+
+/* 사진 출처(접이식) — 소리 버튼과 같은 줄, 펼치면 목록이 버튼 위로 뜬다 */
+.qrow{position:relative}
+.credits{flex:1 1 0;display:block;min-width:112px}
+.credits summary{white-space:nowrap}
+.credits summary{
+  list-style:none;cursor:pointer;min-height:56px;height:100%;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Jua',sans-serif;font-size:18px;
+  background:var(--chip);color:var(--chip-ink);
+  border:3px solid var(--edge);border-radius:16px;padding:8px;
+  box-shadow:0 4px 0 var(--edge);
+}
+.credits summary::-webkit-details-marker{display:none}
+.credits[open] summary{background:var(--sun);color:#2a1c05}
+.credits summary:focus-visible{outline:3px solid var(--berry);outline-offset:3px}
+.cpanel{
+  position:absolute;left:0;right:0;bottom:calc(100% + 10px);z-index:5;
+  background:var(--paper);color:var(--ink);
+  border:3px solid var(--edge);border-radius:16px;box-shadow:0 6px 0 var(--shadow);
+  padding:10px 12px;max-height:min(360px,60vh);overflow:auto;
+  font:13px/1.5 system-ui,-apple-system,'Malgun Gothic',sans-serif;
+}
+.cpanel ol{margin:0;padding-left:22px}
+.cpanel a{color:inherit}
+.cpanel p{margin:8px 0 0;font-size:12px;color:var(--ink-soft)}
+
 @media (prefers-reduced-motion:reduce){
-  .card,.fill,.chip,.btn{transition:none}
-  .pop{animation:none}
+  .card,.fill,.chip,.btn,.mode,.opt{transition:none}
+  .pop,.qcard.cheer,.lcap{animation:none}
+  .burst{display:none}
 }
 @media (max-width:420px){
   h1{font-size:22px}
-  .card{aspect-ratio:1/1}
+  .card,.qcard{aspect-ratio:1/1}
+  /* 폰 세로 — 모드 3개를 한 줄에: 이모지를 위, 이름을 아래로 */
+  .modes{gap:8px}
+  .mode{font-size:16px;padding:6px 4px;min-height:62px}
+  .mode .mi{display:block;font-size:21px;margin-bottom:2px}
+  .credits summary{font-size:16px;padding:6px 4px}
+}
+/* 폰 세로 랜드마크 — 버튼이 셋(다음·소리·출처)이면 '다음 문제'를 한 줄 위로 올려 글자가 꺾이지 않게 */
+@media (max-width:520px) and (orientation:portrait){
+  .land-on .qrow{flex-wrap:wrap}
+  .land-on .qrow .btn.main{flex:1 1 100%}
+  .land-on #qsound{white-space:nowrap}
 }
 
 /* ── 태블릿 세로 — 화면이 넓으니 카드와 글씨를 키운다 ── */
@@ -184,6 +334,11 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   .btn{font-size:21px;padding:17px 10px;border-radius:18px}
   .hint,.tip{font-size:17px}
   .count{font-size:18px}
+  .mode{font-size:22px;min-height:64px}
+  .qcard{aspect-ratio:3/2}
+  .opt{min-height:76px;font-size:26px}
+  .qtip{font-size:20px}
+  .credits summary{font-size:20px}
 }
 
 /* ── 가로 — 세로 공간이 모자라니 카드(왼쪽)와 조작부(오른쪽)를 나눈다 ── */
@@ -197,27 +352,34 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
     grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);
     grid-template-areas:
       "stage head"
+      "stage mode"
       "stage levels"
       "stage bar"
       "stage nav"
       "stage tip";
-    grid-template-rows:auto auto auto auto 1fr;
+    grid-template-rows:auto auto auto auto auto 1fr;
     align-items:start;
     gap:14px 28px;
   }
   header{grid-area:head}
+  .modes{grid-area:mode}
   .levels{grid-area:levels}
   .bar{grid-area:bar}
   .nav{grid-area:nav;flex-wrap:wrap}
   .tip{grid-area:tip;text-align:left}
   .stage{grid-area:stage;align-self:center;display:grid;place-items:center}
-  .card{
+  .card,.qcard{
     aspect-ratio:3/2;
     /* 화면 높이를 넘지 않게 — 3:2라서 허용 높이에 1.5를 곱하면 너비 한계가 된다 */
     max-width:calc((100dvh - 56px) * 1.5);
   }
+  .qstage{grid-area:stage;align-self:center}
+  .qside{grid-area:nav}
+  .qtip{grid-area:tip;text-align:left}
   .btn{flex:1 1 130px}
   .btn.main{flex:1 1 100%;order:-1}
+  .qrow{flex-wrap:wrap}
+  .credits{flex:1 1 130px}
 }
 
 /* 폰을 눕힌 경우 — 세로가 390px 남짓이라 조작부를 촘촘하게 */
@@ -230,18 +392,45 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   .chip{font-size:13.5px;padding:5px 11px;box-shadow:0 2px 0 var(--edge)}
   .btn{font-size:16px;padding:10px 6px;box-shadow:0 3px 0 var(--edge)}
   .tip{display:none}         /* 카드 안에 같은 안내가 있다 */
-  .card{max-width:calc((100dvh - 34px) * 1.5)}
+  .card,.qcard{max-width:calc((100dvh - 34px) * 1.5)}
+  /* 모드 줄이 더해진 만큼 세로 390px을 넘지 않게 — 단계 칩은 한 줄로 두고 옆으로 밀어 본다 */
+  .mode{min-height:44px;font-size:16px;padding:4px 8px;box-shadow:0 3px 0 var(--edge)}
+  .levels{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .levels::-webkit-scrollbar{display:none}
+  .chip{flex:none}
+  .quiz-on .chip{min-height:36px}
+  .opt{min-height:50px;font-size:18px;padding:6px}
+  .opts{gap:8px}
+  .qside{gap:8px}
+  .qrow{flex-wrap:nowrap}
+  .qrow .btn{flex:1 1 0;min-height:46px}
+  .qtip{font-size:14px}
+  /* 오른쪽 칸이 280px 남짓 — 모드 3개를 한 줄로 두려고 글자와 여백을 줄인다 */
+  .modes{gap:6px}
+  .mode{font-size:14px;padding:3px 2px;white-space:nowrap;letter-spacing:-.3px}
+  .mode .mi{font-size:12px}
+  .land-on .qcard{padding:8px;gap:5px}
+  .land-on .qask{font-size:16px}
+  /* 나라 이름은 수도보다 길다(남아프리카 공화국) — 두 줄이 되어도 버튼 높이가 그대로이게 */
+  .land-on .opt{font-size:16px;line-height:1.05;padding:4px;min-height:50px}
+  .lcap{font-size:15px;bottom:6px;left:6px}
+  .lcap .tflag{width:28px}
+  .tflag{width:30px}
+  .credits{flex:1 1 0;min-width:0}
+  #qsound{white-space:nowrap}
+  .credits summary{min-height:46px;font-size:16px;padding:6px;box-shadow:0 3px 0 var(--edge)}
+  .cpanel{max-height:calc(100dvh - 140px)}
 }
 
 /* dvh를 모르는 브라우저를 위한 대비 */
 @supports not (height:100dvh){
   @media (orientation:landscape) and (min-width:760px){
     .wrap{min-height:calc(100vh - 36px)}
-    .card{max-width:calc((100vh - 56px) * 1.5)}
+    .card,.qcard{max-width:calc((100vh - 56px) * 1.5)}
   }
   @media (orientation:landscape) and (max-height:470px){
     .wrap{min-height:calc(100vh - 24px)}
-    .card{max-width:calc((100vh - 34px) * 1.5)}
+    .card,.qcard{max-width:calc((100vh - 34px) * 1.5)}
   }
 }
 </style>
@@ -253,6 +442,12 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
       <span id="starIcon">⭐</span><b id="starNum">0</b>
     </div>
   </header>
+
+  <div class="modes" role="group" aria-label="놀이 고르기">
+    <button class="mode" id="modeCard" type="button" aria-pressed="true"><span class="mi">🃏</span> 국기 카드</button>
+    <button class="mode" id="modeQuiz" type="button" aria-pressed="false"><span class="mi">🏙️</span> 수도 퀴즈</button>
+    <button class="mode" id="modeLand" type="button" aria-pressed="false"><span class="mi">🗼</span> 랜드마크</button>
+  </div>
 
   <div class="levels" id="levels" role="group" aria-label="단계 고르기"></div>
 
@@ -283,9 +478,92 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   </div>
 
   <p class="tip" id="tip">카드를 누르면 정답이 나와요</p>
+
+  <!-- 수도 퀴즈 · 랜드마크 퀴즈 — 카드 모드와 같은 자리(grid-area)를 나눠 쓴다 -->
+  <div class="qstage" id="qstage" hidden>
+    <div class="qcard" id="qcard">
+      <div class="qplay" id="qplay" style="display:contents">
+        <span class="flagbox" id="qflag"></span>
+        <span class="qname" id="qname">대한민국</span>
+        <div class="lphoto" id="lphoto" hidden>
+          <img id="limg" alt="" decoding="async">
+          <div class="lfall" id="lfall" hidden>
+            <span class="em" id="lfEm" aria-hidden="true">📍</span>
+            <b id="lfName"></b>
+            <small>사진을 불러오지 못했어요</small>
+          </div>
+          <div class="lcap" id="lcap" hidden></div>
+        </div>
+        <p class="qask" id="qask">이 나라의 수도는?</p>
+      </div>
+      <div class="qres" id="qres" hidden>
+        <div class="big" id="resBig">🏆</div>
+        <h2 id="resTitle">최고예요!</h2>
+        <div class="qstars" id="resStars" aria-hidden="true"></div>
+        <p id="resText">10문제 중 10개 맞혔어요</p>
+      </div>
+      <div class="burst" id="burst" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="qside" id="qside" hidden>
+    <div class="opts" id="opts" role="group" aria-label="수도 고르기"></div>
+    <div class="qrow">
+      <button class="btn main" id="qnext" type="button" hidden>다음 문제 →</button>
+      <button class="btn main" id="qagain" type="button" hidden>🔁 다시 하기</button>
+      <button class="btn" id="qcards" type="button" hidden>🃏 카드 보기</button>
+      <button class="btn" id="qsound" type="button" aria-pressed="true">🔊 소리</button>
+      <!-- 사진 출처 — 소리 버튼 옆 접이식, 펼치면 위로 떠오르는 목록(화면 높이를 늘리지 않는다) -->
+      <details class="credits" id="credits" hidden>
+        <summary>📷 사진 출처</summary>
+        <div class="cpanel">
+          <ol id="creditList"></ol>
+          <p>Pexels 사진은 Pexels 라이선스, Wikimedia Commons 사진은 표시된 CC 라이선스를 따릅니다.
+             사진은 긴 변 800px로 줄여 실었습니다.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <p class="qtip" id="qtip" aria-live="polite" hidden></p>
 </div>
 
 <script src="flags.js"></script>
+<script id="quiz-logic">
+// 수도 퀴즈 출제 규칙 — 화면과 떼어 두어 자동 시험(100판 시뮬레이션)에서도 그대로 쓴다
+window.CapQuiz = (function(){
+  var ROUND = 10;   // 한 판 문제 수(대륙 풀이 10개보다 적으면 그 수만큼)
+
+  function shuffled(arr, rnd){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(rnd()*(i+1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // 보기 4개: 정답 + 오답 3개. 오답은 같은 대륙에서 먼저, 모자라면 퀴즈 나라 전체에서 채운다.
+  // 보기 글자(key)가 겹치는 보기는 넣지 않는다 — 수도 퀴즈는 수도명(p), 랜드마크 퀴즈는 나라 이름(k).
+  function choices(q, all, rnd, key){
+    key = key || 'p';
+    var used = {}; used[q[key]] = 1;
+    var out = [q];
+    var same = shuffled(all.filter(function(f){ return f.t === q.t; }), rnd);
+    var rest = shuffled(all.filter(function(f){ return f.t !== q.t; }), rnd);
+    same.concat(rest).forEach(function(f){
+      if(out.length < 4 && !used[f[key]]){ used[f[key]] = 1; out.push(f); }
+    });
+    return shuffled(out, rnd);
+  }
+
+  function round(pool, rnd){
+    return shuffled(pool, rnd).slice(0, Math.min(ROUND, pool.length));
+  }
+
+  return {ROUND:ROUND, shuffled:shuffled, choices:choices, round:round};
+})();
+</script>
 <script>
 (function(){
   var ALL = window.FLAGS || [];
@@ -306,9 +584,52 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
                     'ru','in','mx','ch','se','no','nl','eg','th','vn','ph','sg',
                     'nz','ar','tr','gr','pt','za'];
 
+  // 수도 퀴즈는 수도가 붙은 주요 50개국 안에서만 낸다(정답·오답 보기 모두)
+  var QUIZ = ALL.filter(function(f){return f.p});
+  var QLEVELS = [
+    {id:'easy', label:'쉬워요', pick:function(f){return f.d===1}},
+    {id:'all',  label:'전체',   pick:function(){return true}},
+    {id:'asia', label:'아시아·오세아니아', pick:function(f){return f.t==='아시아'||f.t==='오세아니아'}},
+    {id:'eu',   label:'유럽',     pick:function(f){return f.t==='유럽'}},
+    {id:'af',   label:'아프리카', pick:function(f){return f.t==='아프리카'}},
+    {id:'am',   label:'아메리카', pick:function(f){return f.t==='북아메리카'||f.t==='남아메리카'}}
+  ];
+
+  // 랜드마크 퀴즈 — 같은 50개국(사진이 붙은 나라), 단계도 수도 퀴즈와 같다
+  var LQUIZ = QUIZ.filter(function(f){return f.l});
+
   var $ = function(id){return document.getElementById(id)};
   var deck = [], at = 0, shown = false, level = 'easy';
   var seen = load();
+  var mode = 'card';          // 'card' | 'quiz'(수도) | 'land'(랜드마크)
+  var qlevel = pref('flagcards.qlevel') || 'all';
+  var llevel = pref('flagcards.llevel') || 'all';
+  var sound = pref('flagcards.sound') !== '0';
+  // 기록은 퀴즈마다 따로 — 수도 flagcards.capitals / 랜드마크 flagcards.landmarks
+  var cap = loadRec('flagcards.capitals');
+  var land = loadRec('flagcards.landmarks');
+  function isQuiz(){ return mode !== 'card'; }
+  function rec(){ return mode === 'land' ? land : cap; }
+  function saveRec(){
+    setPref(mode === 'land' ? 'flagcards.landmarks' : 'flagcards.capitals', JSON.stringify(rec()));
+  }
+  function pool(){ return mode === 'land' ? LQUIZ : QUIZ; }
+  // 한 판 상태: qs=[{f, again}], mainN=본 문제 수, again=틀린 나라 복습 문제
+  var qs = [], qi = 0, mainN = 0, score = 0, reviewGot = 0,
+      wrongs = [], reviewAdded = false, answered = false, timer = null, refocus = false;
+
+  // 저장이 막힌 환경(사생활 보호 창 등)에서도 퀴즈는 그대로 돌아야 한다
+  function pref(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function setPref(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+  function loadRec(k){
+    try{
+      var o = JSON.parse(localStorage.getItem(k) || 'null');
+      if(o && typeof o.got === 'object' && o.got){
+        return {got:o.got, plays:+o.plays||0, best:+o.best||0};
+      }
+    }catch(e){}
+    return {got:{}, plays:0, best:0};
+  }
 
   function load(){
     try{
@@ -347,15 +668,19 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   function chips(){
     var box = $('levels');
     box.innerHTML = '';
-    LEVELS.forEach(function(L){
-      var n = ALL.filter(L.pick).length;
+    var quiz = isQuiz();
+    var cur = mode === 'land' ? llevel : mode === 'quiz' ? qlevel : level;
+    (quiz ? QLEVELS : LEVELS).forEach(function(L){
+      var n = (quiz ? pool() : ALL).filter(L.pick).length;
       var b = document.createElement('button');
       b.className = 'chip';
       b.type = 'button';
-      b.id = 'lv-' + L.id;
-      b.setAttribute('aria-pressed', String(L.id===level));
+      b.id = (mode === 'land' ? 'lq-' : quiz ? 'qv-' : 'lv-') + L.id;
+      b.setAttribute('aria-pressed', String(L.id === cur));
       b.textContent = L.label + ' ' + n;
-      b.addEventListener('click', function(){ build(L.id); });
+      b.addEventListener('click', function(){
+        if(quiz) startQuiz(L.id); else build(L.id);
+      });
       box.appendChild(b);
     });
   }
@@ -376,7 +701,23 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
             : '국기 카드. 누르면 정답이 나옵니다');
     $('tip').textContent = shown ? '한 번 더 누르면 다음 나라로 가요'
                                  : '카드를 누르면 정답이 나와요';
-    $('starNum').textContent = Object.keys(seen).length;
+    updStars();
+  }
+
+  // 머리의 별 칩 — 카드 모드는 처음 본 나라(⭐), 수도 퀴즈는 수도를 맞힌 나라(🏆),
+  // 랜드마크 퀴즈는 랜드마크를 맞힌 나라(📸)
+  function updStars(){
+    $('starIcon').textContent = mode === 'land' ? '📸' : mode === 'quiz' ? '🏆' : '⭐';
+    $('starNum').textContent = isQuiz() ? Object.keys(rec().got).length : Object.keys(seen).length;
+    $('starIcon').parentNode.title = mode === 'land' ? '랜드마크를 맞힌 나라마다 사진 하나'
+                                   : mode === 'quiz' ? '수도를 맞힌 나라마다 트로피 하나'
+                                   : '처음 본 나라마다 별 하나';
+  }
+  function popStar(){
+    var ic = $('starIcon');
+    ic.classList.remove('pop');
+    void ic.offsetWidth;
+    ic.classList.add('pop');
   }
 
   function reveal(){
@@ -384,10 +725,7 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
     var f = deck[at];
     if(f && !seen[f.c]){
       seen[f.c] = 1; save();
-      var ic = $('starIcon');
-      ic.classList.remove('pop');
-      void ic.offsetWidth;
-      ic.classList.add('pop');
+      popStar();
     }
     render();
   }
@@ -409,9 +747,344 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   });
 
   document.addEventListener('keydown', function(e){
+    if(isQuiz()){
+      // 숫자 1~4로 보기 고르기
+      var n = '1234'.indexOf(e.key);
+      var opts = $('opts').children;
+      if(n >= 0 && !answered && opts[n] && !$('qside').hidden && !$('opts').hidden){
+        opts[n].click(); e.preventDefault();
+      }
+      return;
+    }
     if(e.key === 'ArrowRight'){ go(1); e.preventDefault(); }
     else if(e.key === 'ArrowLeft'){ go(-1); e.preventDefault(); }
   });
+
+  /* ───────── 수도 퀴즈 ───────── */
+
+  // 받침 있으면 '이에요', 없으면 '예요'(한글이 아니면 받침 없음으로 본다)
+  function iEyo(word){
+    var c = word.charCodeAt(word.length-1) - 0xAC00;
+    return (c >= 0 && c <= 11171 && c % 28) ? '이에요' : '예요';
+  }
+  // 받침 있으면 '은', 없으면 '는' — 에펠탑은 / 빅벤은 / CN 타워는
+  function eunNeun(word){
+    var c = word.charCodeAt(word.length-1) - 0xAC00;
+    return (c >= 0 && c <= 11171 && c % 28) ? '은' : '는';
+  }
+
+  // 짧은 효과음 — 파일 없이 WebAudio로 만든다. 소리를 꺼 두면 아무것도 하지 않는다
+  var actx = null;
+  function tone(seq){
+    if(!sound) return;
+    try{
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      if(actx.state === 'suspended') actx.resume();
+      var t = actx.currentTime;
+      seq.forEach(function(n){   // [주파수, 시작, 길이, 파형, 음량]
+        var o = actx.createOscillator(), g = actx.createGain();
+        o.type = n[3] || 'triangle';
+        o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, t + n[1]);
+        g.gain.exponentialRampToValueAtTime(n[4] || 0.18, t + n[1] + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + n[1] + n[2]);
+        o.connect(g); g.connect(actx.destination);
+        o.start(t + n[1]); o.stop(t + n[1] + n[2] + 0.05);
+      });
+    }catch(e){}
+  }
+  var SND_OK   = [[784,0,.16],[1047,.11,.32]];
+  var SND_SOFT = [[523,0,.2,'sine',.08],[440,.15,.32,'sine',.08]];   // 오답 — 낮고 작게
+  var SND_END  = [[523,0,.14],[659,.12,.14],[784,.24,.14],[1047,.36,.45]];
+
+  function burst(){
+    var box = $('burst');
+    box.innerHTML = '';
+    for(var i=0;i<8;i++){
+      var s = document.createElement('span');
+      s.textContent = i % 3 ? '⭐' : '✨';
+      s.style.setProperty('--dx', Math.round((Math.random()*2-1)*160) + 'px');
+      s.style.setProperty('--dy', -Math.round(60 + Math.random()*120) + 'px');
+      s.style.setProperty('--r', Math.round((Math.random()*2-1)*90) + 'deg');
+      s.style.animationDelay = (i*30) + 'ms';
+      box.appendChild(s);
+    }
+    var c = $('qcard');
+    c.classList.remove('cheer'); void c.offsetWidth; c.classList.add('cheer');
+    setTimeout(function(){ box.innerHTML = ''; }, 1300);
+  }
+
+  /* ───────── 랜드마크 퀴즈 도우미 ───────── */
+
+  // 사진은 flags.js에 넣지 않고 같은 폴더의 landmarks/<code>.webp를 부른다(Artifact·Pages 같은 경로)
+  function photoUrl(f){ return 'landmarks/' + f.c + '.webp'; }
+
+  function showPhoto(f){
+    var img = $('limg');
+    $('lcap').hidden = true;
+    $('lfall').hidden = true;
+    img.hidden = false;
+    img.alt = '어느 나라에 있는 랜드마크일까요? 사진';
+    // 못 불러오면 사진 대신 이모지와 랜드마크 이름을 보인다(나라 이름은 정답이라 숨긴다)
+    img.onerror = function(){
+      img.hidden = true;
+      $('lfEm').textContent = f.l.m || '📍';
+      $('lfName').textContent = f.l.k;
+      $('lfall').hidden = false;
+    };
+    img.src = photoUrl(f);
+  }
+
+  // 다음 문제 사진을 미리 받아 둔다 — 넘어갈 때 빈 칸이 보이지 않게
+  function preload(item){
+    if(!item) return;
+    try{ var p = new Image(); p.src = photoUrl(item.f); }catch(e){}
+  }
+
+  function flagSpan(f){
+    var s = document.createElement('span');
+    s.className = 'tflag';
+    s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = f.s;      // 우리 데이터(flags.js)의 국기 SVG
+    return s;
+  }
+
+  // "에펠탑은 프랑스에 있어요"
+  function landSay(f){ return f.l.k + eunNeun(f.l.k) + ' ' + f.k + '에 있어요'; }
+
+  function landTip(tip, text, f, tail){
+    tip.textContent = text + ' ';
+    tip.appendChild(flagSpan(f));
+    tip.appendChild(document.createTextNode(tail));
+  }
+
+  // 답한 뒤 사진 위 이름표 — [국기] 에펠탑 · 프랑스
+  function showAnswer(f){
+    var tag = $('lcap');
+    tag.innerHTML = '';
+    tag.appendChild(flagSpan(f));
+    tag.appendChild(document.createTextNode(f.l.k + ' · ' + f.k));
+    tag.hidden = false;
+    $('limg').alt = f.l.k + ' (' + f.k + ') 사진';
+  }
+
+  // 사진 출처 — 나라별 촬영자와 원본 링크(접힌 상태로 두었다가 처음 열 때 만든다)
+  function buildCredits(){
+    var ol = $('creditList');
+    if(ol.childNodes.length) return;
+    function link(href, text){
+      var a = document.createElement('a');
+      a.href = href; a.textContent = text;
+      a.target = '_blank'; a.rel = 'noopener noreferrer';
+      return a;
+    }
+    LQUIZ.slice().sort(function(a, b){ return a.k.localeCompare(b.k, 'ko'); }).forEach(function(f){
+      var l = f.l, li = document.createElement('li');
+      li.appendChild(document.createTextNode(f.k + ' · ' + l.k + ' — '));
+      li.appendChild(l.bu ? link(l.bu, l.by) : document.createTextNode(l.by));
+      li.appendChild(document.createTextNode(' / '));
+      li.appendChild(link(l.u, l.s));
+      if(l.s !== 'Pexels'){
+        li.appendChild(document.createTextNode(' ('));
+        li.appendChild(l.lu ? link(l.lu, l.li) : document.createTextNode(l.li));
+        li.appendChild(document.createTextNode(')'));
+      }
+      ol.appendChild(li);
+    });
+  }
+
+  function setMode(m){
+    mode = (m === 'quiz' || m === 'land') ? m : 'card';
+    setPref('flagcards.mode', mode);
+    var quiz = isQuiz(), isLand = mode === 'land';
+    $('modeCard').setAttribute('aria-pressed', String(mode === 'card'));
+    $('modeQuiz').setAttribute('aria-pressed', String(mode === 'quiz'));
+    $('modeLand').setAttribute('aria-pressed', String(isLand));
+    document.querySelector('.wrap').classList.toggle('quiz-on', quiz);
+    document.querySelector('.wrap').classList.toggle('land-on', isLand);
+    // 같은 퀴즈 카드를 쓰되 수도 퀴즈는 국기+나라 이름, 랜드마크 퀴즈는 사진을 보인다
+    $('qflag').hidden = isLand;
+    $('qname').hidden = isLand;
+    $('lphoto').hidden = !isLand;
+    $('credits').hidden = !isLand;
+    if(isLand) buildCredits();
+    else $('credits').open = false;
+    $('opts').setAttribute('aria-label', isLand ? '나라 고르기' : '수도 고르기');
+    document.querySelector('.stage').hidden = quiz;
+    document.querySelector('.nav').hidden = quiz;
+    $('tip').hidden = quiz;
+    $('qstage').hidden = !quiz;
+    $('qside').hidden = !quiz;
+    $('qtip').hidden = !quiz;
+    clearTimeout(timer);
+    if(quiz){ startQuiz(); }
+    else { chips(); render(); }
+  }
+
+  function startQuiz(id){
+    var isLand = mode === 'land';
+    var cur = id || (isLand ? llevel : qlevel);
+    var L = QLEVELS.filter(function(x){return x.id===cur})[0];
+    if(!L){ L = QLEVELS[1]; }
+    if(isLand){ llevel = L.id; setPref('flagcards.llevel', llevel); }
+    else { qlevel = L.id; setPref('flagcards.qlevel', qlevel); }
+    qs = CapQuiz.round(pool().filter(L.pick), Math.random)
+                .map(function(f){ return {f:f, again:false}; });
+    mainN = qs.length; qi = 0; score = 0; reviewGot = 0;
+    wrongs = []; reviewAdded = false;
+    $('qplay').hidden = false;
+    $('qres').hidden = true;
+    $('opts').hidden = false;
+    $('qagain').hidden = true;
+    $('qcards').hidden = true;
+    chips();
+    updStars();
+    ask();
+  }
+
+  function ask(){
+    clearTimeout(timer);
+    answered = false;
+    var item = qs[qi], f = item.f, isLand = mode === 'land';
+    var key = isLand ? 'k' : 'p';   // 보기 글자: 랜드마크 퀴즈는 나라 이름, 수도 퀴즈는 수도
+    if(isLand){
+      showPhoto(f);
+      preload(qs[qi+1]);
+      $('qask').textContent = (item.again ? '한 번 더! ' : '') + '이 랜드마크는 어느 나라에 있을까요?';
+    }else{
+      $('qflag').innerHTML = f.s;
+      $('qname').textContent = f.k;
+      $('qask').textContent = item.again ? '한 번 더! 이 나라의 수도는?' : '이 나라의 수도는?';
+    }
+    var box = $('opts');
+    box.innerHTML = '';
+    CapQuiz.choices(f, pool(), Math.random, key).forEach(function(c, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.textContent = c[key];
+      b.setAttribute('data-code', c.c);
+      b.setAttribute('aria-label', (i+1) + '번 ' + c[key]);
+      b.addEventListener('click', function(){ pick(b, item); });
+      box.appendChild(b);
+    });
+    if(item.again){
+      var k = qi - mainN + 1, m = qs.length - mainN;
+      $('count').textContent = '복습 ' + k + ' / ' + m;
+      $('fill').style.width = (k/m*100) + '%';
+    }else{
+      $('count').textContent = (qi+1) + ' / ' + mainN;
+      $('fill').style.width = ((qi+1)/mainN*100) + '%';
+    }
+    $('qtip').textContent = '';
+    $('qtip').className = 'qtip';
+    $('qnext').hidden = true;
+    if(refocus){ box.firstChild.focus(); refocus = false; }
+  }
+
+  function pick(btn, item){
+    if(answered) return;
+    answered = true;
+    refocus = $('qside').contains(document.activeElement);
+    var f = item.f, ok = btn.getAttribute('data-code') === f.c;
+    Array.prototype.forEach.call($('opts').children, function(b){
+      b.disabled = true;
+      if(b.getAttribute('data-code') === f.c) b.classList.add('ok');
+      else if(b === btn) b.classList.add('no');
+      else b.classList.add('dim');
+    });
+    var tip = $('qtip'), isLand = mode === 'land';
+    if(isLand) showAnswer(f);
+    if(ok){
+      if(item.again) reviewGot++; else score++;
+      rec().got[f.c] = (rec().got[f.c] || 0) + 1;
+      saveRec();
+      updStars(); popStar(); burst(); tone(SND_OK);
+      tip.className = 'qtip good';
+      if(isLand){
+        // 사진과 이름표를 볼 시간을 조금 더 준다
+        landTip(tip, '딩동댕! ' + landSay(f), f, ' ⭐');
+        timer = setTimeout(next, 2200);
+      }else{
+        tip.textContent = '딩동댕! ' + f.k + '의 수도는 ' + f.p + iEyo(f.p) + ' ⭐';
+        timer = setTimeout(next, 1400);
+      }
+    }else{
+      if(!item.again) wrongs.push(f);
+      tone(SND_SOFT);
+      if(isLand) landTip(tip, '괜찮아요! ' + landSay(f), f, '. 같이 기억해요 🙂');
+      else tip.textContent = '괜찮아요! ' + f.k + '의 수도는 ' + f.p + iEyo(f.p) + '. 같이 기억해요 🙂';
+      $('qnext').hidden = false;
+      $('qnext').focus();
+    }
+  }
+
+  function next(){
+    clearTimeout(timer);
+    if(document.activeElement === $('qnext')) refocus = true;
+    qi++;
+    // 본 문제가 끝나면 틀린 나라를 한 번씩만 다시 낸다
+    if(qi === mainN && wrongs.length && !reviewAdded){
+      reviewAdded = true;
+      CapQuiz.shuffled(wrongs, Math.random).forEach(function(f){
+        qs.push({f:f, again:true});
+      });
+    }
+    if(qi >= qs.length) finish(); else ask();
+  }
+
+  function finish(){
+    clearTimeout(timer);
+    var R = rec();
+    R.plays++;
+    R.best = Math.max(R.best, score);
+    saveRec();
+    var r = mainN ? score / mainN : 0;
+    $('resBig').textContent = r >= 0.8 ? '🏆' : r >= 0.5 ? '🎉' : '🌱';
+    $('resTitle').textContent = r >= 0.8 ? '최고예요!' : r >= 0.5 ? '잘했어요!' : '조금씩 늘고 있어요!';
+    var stars = $('resStars');
+    stars.innerHTML = '';
+    for(var i=0;i<mainN;i++){
+      var s = document.createElement('span');
+      s.textContent = '⭐';
+      if(i >= score) s.className = 'off';
+      stars.appendChild(s);
+    }
+    var txt = mainN + '문제 중 ' + score + '개 맞혔어요';
+    if(reviewAdded) txt += ' · 다시 풀어서 ' + reviewGot + '개 더 맞혔어요';
+    $('resText').textContent = txt;
+    $('qplay').hidden = true;
+    $('qres').hidden = false;
+    $('opts').hidden = true;
+    $('qnext').hidden = true;
+    $('qagain').hidden = false;
+    $('qcards').hidden = false;
+    $('count').textContent = '끝!';
+    $('fill').style.width = '100%';
+    $('qtip').className = 'qtip good';
+    $('qtip').textContent = '별 ' + score + '개를 모았어요! 다시 하기를 누르면 새 문제가 나와요';
+    tone(r >= 0.5 ? SND_END : SND_OK);
+    if(refocus || $('qside').contains(document.activeElement)){ $('qagain').focus(); }
+    refocus = false;
+  }
+
+  $('modeCard').addEventListener('click', function(){ if(mode !== 'card') setMode('card'); });
+  $('modeQuiz').addEventListener('click', function(){ setMode('quiz'); });
+  $('modeLand').addEventListener('click', function(){ setMode('land'); });
+  $('credits').addEventListener('toggle', function(){ if($('credits').open) buildCredits(); });
+  $('qnext').addEventListener('click', next);
+  $('qagain').addEventListener('click', function(){ refocus = true; startQuiz(); });
+  $('qcards').addEventListener('click', function(){ setMode('card'); });
+  function soundBtn(){
+    $('qsound').setAttribute('aria-pressed', String(sound));
+    $('qsound').textContent = sound ? '🔊 소리 켬' : '🔇 소리 끔';
+  }
+  $('qsound').addEventListener('click', function(){
+    sound = !sound;
+    setPref('flagcards.sound', sound ? '1' : '0');
+    soundBtn();
+  });
+  soundBtn();
 
   // 모바일 좌우 쓸기
   var x0 = null;
@@ -425,5 +1098,7 @@ h1{margin:0;font-size:26px;letter-spacing:.5px;text-wrap:balance}
   }, {passive:true});
 
   build('easy');
+  var lastMode = pref('flagcards.mode');
+  if(lastMode === 'quiz' || lastMode === 'land') setMode(lastMode);
 })();
 </script>
